@@ -1,11 +1,11 @@
 from rest_framework import generics
-from accounts.permissions import IsProcurementOrAdmin
-from .models import PurchaseOrder
-from .serializers import PurchaseOrderSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count, Avg, Case, When, F, FloatField
+from accounts.permissions import IsProcurementOrAdmin
 from suppliers.models import Supplier
+from .models import PurchaseOrder, SupplierPayment
+from .serializers import PurchaseOrderSerializer, SupplierPaymentSerializer
 
 
 class PurchaseOrderListCreateView(generics.ListCreateAPIView):
@@ -22,10 +22,6 @@ class PurchaseOrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PurchaseOrderSerializer
     permission_classes = [IsProcurementOrAdmin]
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.db.models import Count, Avg, Case, When, F, FloatField
-from suppliers.models import Supplier
 
 class SupplierPerformanceView(APIView):
     permission_classes = [IsProcurementOrAdmin]
@@ -51,7 +47,6 @@ class SupplierPerformanceView(APIView):
             delivered = pos.filter(status="DELIVERED").count()
             completion_rate = round((delivered / total_orders) * 100, 1)
 
-            # Punctuality: delivered on/before expected date
             delivered_with_dates = pos.filter(
                 status="DELIVERED",
                 expected_delivery_date__isnull=False,
@@ -66,7 +61,6 @@ class SupplierPerformanceView(APIView):
                 if delivered_with_dates.count() > 0 else None
             )
 
-            # Weighted score: 60% completion, 40% punctuality (only if punctuality data exists)
             if punctuality_rate is not None:
                 score = round((completion_rate * 0.6) + (punctuality_rate * 0.4), 1)
             else:
@@ -84,3 +78,12 @@ class SupplierPerformanceView(APIView):
 
         results.sort(key=lambda x: (x["score"] is None, -(x["score"] or 0)))
         return Response(results)
+
+
+class SupplierPaymentListCreateView(generics.ListCreateAPIView):
+    queryset = SupplierPayment.objects.all().order_by("-paid_at")
+    serializer_class = SupplierPaymentSerializer
+    permission_classes = [IsProcurementOrAdmin]
+
+    def perform_create(self, serializer):
+        serializer.save(paid_by=self.request.user)

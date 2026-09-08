@@ -26,7 +26,8 @@ export default function TopBar({ title, subtitle }) {
   return (
     <div className="topbar">
       <div>
-        <h1>{title}</h1>
+        <span style={{ fontSize: 11, fontWeight: 600, color: "var(--rust)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Overview</span>
+        <h1 style={{ marginTop: 4 }}>{title}</h1>
         {subtitle && <p>{subtitle}</p>}
       </div>
 

@@ -9,6 +9,7 @@ const navItems = [
   { label: "Purchase Orders", path: "/purchase-orders", icon: "cart" },
   { label: "Inventory", path: "/inventory", icon: "box" },
   { label: "Billing", path: "/billing", icon: "receipt" },
+  { label: "Supplier Payments", path: "/supplier-payments", icon: "payment" },
   { label: "Analytics", path: "/analytics", icon: "chart" },
 ];
 
@@ -19,6 +20,7 @@ const icons = {
   cart: <><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></>,
   box: <><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><path d="M3.27 6.96L12 12.01l8.73-5.05" /><path d="M12 22.08V12" /></>,
   receipt: <><path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2-1 1z" /><path d="M8 7h8M8 11h8M8 15h5" /></>,
+  payment: <><rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" /></>,
   chart: <><path d="M3 3v18h18" /><rect x="7" y="12" width="3" height="6" /><rect x="12" y="8" width="3" height="10" /><rect x="17" y="5" width="3" height="13" /></>,
 };
 

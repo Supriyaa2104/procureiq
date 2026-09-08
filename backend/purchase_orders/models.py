@@ -29,5 +29,32 @@ class PurchaseOrder(models.Model):
         self.total_amount = self.quantity * self.unit_price
         super().save(*args, **kwargs)
 
+    @property
+    def amount_paid(self):
+        return sum(p.amount for p in self.supplier_payments.all())
+
+    @property
+    def balance_due(self):
+        return self.total_amount - self.amount_paid
+
     def __str__(self):
         return f"PO#{self.id} - {self.item_name} ({self.status})"
+
+
+class SupplierPayment(models.Model):
+    class Method(models.TextChoices):
+        CASH = "CASH", "Cash"
+        BANK_TRANSFER = "BANK_TRANSFER", "Bank Transfer"
+        ESEWA = "ESEWA", "eSewa"
+        CHEQUE = "CHEQUE", "Cheque"
+
+    purchase_order = models.ForeignKey(
+        PurchaseOrder, on_delete=models.CASCADE, related_name="supplier_payments"
+    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    method = models.CharField(max_length=20, choices=Method.choices, default=Method.CASH)
+    paid_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    paid_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Rs.{self.amount} to PO#{self.purchase_order_id}"

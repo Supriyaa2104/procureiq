@@ -7,8 +7,9 @@ import PurchaseOrdersPage from "./pages/PurchaseOrdersPage";
 import InventoryPage from "./pages/InventoryPage";
 import BillingPage from "./pages/BillingPage";
 import BillDetailPage from "./pages/BillDetailPage";
+import SupplierPaymentsPage from "./pages/SupplierPaymentsPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import { useAuth } from "./context/AuthContext";
-import SupplierPerformancePage from "./pages/SupplierPerformancePage";
 
 function App() {
   const { user, loading } = useAuth();
@@ -47,12 +48,16 @@ function App() {
         element={user ? <BillDetailPage /> : <Navigate to="/login" />}
       />
       <Route
-        path="*"
-        element={<Navigate to={user ? "/dashboard" : "/login"} />}
+        path="/supplier-payments"
+        element={user ? <SupplierPaymentsPage /> : <Navigate to="/login" />}
       />
       <Route
         path="/analytics"
-        element={user ? <SupplierPerformancePage /> : <Navigate to="/login" />}
+        element={user ? <AnalyticsPage /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="*"
+        element={<Navigate to={user ? "/dashboard" : "/login"} />}
       />
     </Routes>
   );

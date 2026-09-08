@@ -31,7 +31,6 @@ export default function DashboardPage() {
 
   const totalSpend = purchaseOrders.reduce((sum, po) => sum + parseFloat(po.total_amount || 0), 0);
 
-  // Spend by supplier, for the bar chart
   const spendBySupplier = Object.values(
     purchaseOrders.reduce((acc, po) => {
       const key = po.supplier_name || "Unknown";
@@ -41,7 +40,6 @@ export default function DashboardPage() {
     }, {})
   );
 
-  // Supplier category breakdown, for the pie chart
   const categoryBreakdown = Object.values(
     suppliers.reduce((acc, s) => {
       const key = s.category || "Other";
@@ -51,7 +49,6 @@ export default function DashboardPage() {
     }, {})
   );
 
-  // PO status breakdown, for the little counts row
   const statusCounts = purchaseOrders.reduce((acc, po) => {
     acc[po.status] = (acc[po.status] || 0) + 1;
     return acc;
@@ -59,14 +56,14 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <Layout title="Dashboard" subtitle={`Welcome back, ${user?.username}!`}>
+      <Layout title="Dashboard" subtitle="Your procurement activity at a glance.">
         <p>Loading dashboard...</p>
       </Layout>
     );
   }
 
   return (
-    <Layout title="Dashboard" subtitle={`Welcome back, ${user?.username}! Here's an overview of your procurement.`}>
+    <Layout title="Dashboard" subtitle="Your procurement activity at a glance.">
       <div className="dash-kpis">
         <div className="kpi-card">
           <div className="kpi-icon suppliers">
@@ -104,10 +101,17 @@ export default function DashboardPage() {
           {spendBySupplier.length === 0 ? (
             <div className="chart-empty">No purchase order data yet</div>
           ) : (
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={spendBySupplier}>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={spendBySupplier} margin={{ bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#64748b" }} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 10.5, fill: "#5B6B78" }}
+                  interval={0}
+                  angle={-20}
+                  textAnchor="end"
+                  height={60}
+                />
                 <YAxis tick={{ fontSize: 12, fill: "#64748b" }} />
                 <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #eef0f3", fontSize: 13 }} />
                 <Bar dataKey="spend" fill="#2563eb" radius={[6, 6, 0, 0]} />
