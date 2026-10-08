@@ -17,8 +17,8 @@
 }
 
 .primary-btn {
-  background: var(--rust);
-  color: #FFFFFF;
+  background: var(--gold);
+  color: var(--ink);
   border: none;
   padding: 9px 16px;
   border-radius: 8px;
@@ -28,7 +28,7 @@
 }
 
 .primary-btn:hover:not(:disabled) {
-  background: #A83A0C;
+  background: #B8913F;
 }
 
 .primary-btn:disabled {
@@ -75,17 +75,17 @@
 .form-field input:focus,
 .form-field select:focus {
   outline: none;
-  border-color: var(--steel);
+  border-color: var(--gold);
 }
 
 .form-error {
-  background: var(--rust-soft);
-  color: var(--rust);
+  background: var(--danger-soft);
+  color: var(--danger);
   font-size: 12.5px;
   padding: 10px 12px;
   border-radius: 8px;
   margin-bottom: 14px;
-  border: 1px solid var(--rust);
+  border: 1px solid var(--danger);
   word-break: break-word;
 }
 
@@ -140,18 +140,23 @@
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
-  background: var(--steel-soft);
-  color: var(--steel);
+  background: var(--info-soft);
+  color: var(--info);
 }
 
 .status-pill.approved {
-  background: var(--herb-soft);
-  color: var(--herb);
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .status-pill.rejected {
-  background: var(--rust-soft);
-  color: var(--rust);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.status-pill.low-stock {
+  background: var(--gold-soft);
+  color: var(--gold);
 }
 
 .link-btn {
@@ -161,7 +166,7 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  color: var(--steel);
+  color: var(--info);
 }
 
 .link-btn:hover {
@@ -169,5 +174,5 @@
 }
 
 .link-btn.danger {
-  color: var(--rust);
+  color: var(--danger);
 }

@@ -17,7 +17,9 @@ const CATEGORIES = [
 ];
 
 export default function SuppliersPage() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  const canEdit = user?.role === "ADMIN" || user?.role === "PROCUREMENT_STAFF";
+
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -100,12 +102,14 @@ export default function SuppliersPage() {
       subtitle="Manage your supplier list and contact details."
     >
       <div className="page-header" style={{ justifyContent: "flex-end" }}>
-        <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "+ Add Supplier"}
-        </button>
+        {canEdit && (
+          <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Cancel" : "+ Add Supplier"}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && canEdit && (
         <form className="supplier-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-field">
@@ -217,12 +221,14 @@ export default function SuppliersPage() {
                   </span>
                 </td>
                 <td>
-                  <button
-                    className="link-btn danger"
-                    onClick={() => confirmDelete(s)}
-                  >
-                    Delete
-                  </button>
+                  {canEdit && (
+                    <button
+                      className="link-btn danger"
+                      onClick={() => confirmDelete(s)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

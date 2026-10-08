@@ -8,7 +8,8 @@ import "./SuppliersPage.css"; // reusing the same styles
 const STATUSES = ["PENDING", "RECEIVED", "APPROVED", "REJECTED"];
 
 export default function QuotationsPage() {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  const canEdit = user?.role === "ADMIN" || user?.role === "PROCUREMENT_STAFF";
   const [quotations, setQuotations] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -98,12 +99,14 @@ export default function QuotationsPage() {
       subtitle="Request and track supplier quotations."
     >
       <div className="page-header" style={{ justifyContent: "flex-end" }}>
-        <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "+ Request Quotation"}
-        </button>
+        {canEdit && (
+          <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Cancel" : "+ Request Quotation"}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && canEdit && (
         <form className="supplier-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-field">
@@ -211,14 +214,25 @@ export default function QuotationsPage() {
                   <span className={`status-pill ${q.status.toLowerCase()}`}>
                     {q.status}
                   </span>
+                  {q.price_change_info?.is_spike && (
+                    <span
+                      className="status-pill rejected"
+                      style={{ marginLeft: 6 }}
+                      title={`Previous: Rs. ${q.price_change_info.previous_price} → Now: Rs. ${q.price_change_info.current_price}`}
+                    >
+                      ⚠ +{q.price_change_info.percent_change}%
+                    </span>
+                  )}
                 </td>
                 <td>
-                  <button
-                    className="link-btn danger"
-                    onClick={() => confirmDelete(q)}
-                  >
-                    Delete
-                  </button>
+                  {canEdit && (
+                    <button
+                      className="link-btn danger"
+                      onClick={() => confirmDelete(q)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

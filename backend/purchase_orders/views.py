@@ -2,7 +2,8 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count, Avg, Case, When, F, FloatField
-from accounts.permissions import IsProcurementOrAdmin
+from django.utils import timezone
+from accounts.permissions import IsAuthenticatedReadOnly, IsProcurementOrAdmin, IsOwnerOrAdmin
 from suppliers.models import Supplier
 from .models import PurchaseOrder, SupplierPayment
 from .serializers import PurchaseOrderSerializer, SupplierPaymentSerializer
@@ -11,7 +12,11 @@ from .serializers import PurchaseOrderSerializer, SupplierPaymentSerializer
 class PurchaseOrderListCreateView(generics.ListCreateAPIView):
     queryset = PurchaseOrder.objects.all().order_by("-created_at")
     serializer_class = PurchaseOrderSerializer
-    permission_classes = [IsProcurementOrAdmin]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsProcurementOrAdmin()]
+        return [IsAuthenticatedReadOnly()]
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -20,7 +25,27 @@ class PurchaseOrderListCreateView(generics.ListCreateAPIView):
 class PurchaseOrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PurchaseOrder.objects.all()
     serializer_class = PurchaseOrderSerializer
-    permission_classes = [IsProcurementOrAdmin]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticatedReadOnly()]
+        return [IsProcurementOrAdmin()]
+
+
+class ApprovePurchaseOrderView(APIView):
+    permission_classes = [IsOwnerOrAdmin]
+
+    def post(self, request, pk):
+        try:
+            po = PurchaseOrder.objects.get(pk=pk)
+        except PurchaseOrder.DoesNotExist:
+            return Response({"detail": "Purchase order not found."}, status=404)
+
+        po.approved_by = request.user
+        po.approved_at = timezone.now()
+        po.save()
+
+        return Response(PurchaseOrderSerializer(po).data)
 
 
 class SupplierPerformanceView(APIView):
@@ -83,7 +108,11 @@ class SupplierPerformanceView(APIView):
 class SupplierPaymentListCreateView(generics.ListCreateAPIView):
     queryset = SupplierPayment.objects.all().order_by("-paid_at")
     serializer_class = SupplierPaymentSerializer
-    permission_classes = [IsProcurementOrAdmin]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsProcurementOrAdmin()]
+        return [IsAuthenticatedReadOnly()]
 
     def perform_create(self, serializer):
         serializer.save(paid_by=self.request.user)

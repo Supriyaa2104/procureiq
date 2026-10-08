@@ -5,7 +5,7 @@ import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
 import "./DashboardPage.css";
 
-const COLORS = ["#2563eb", "#0d9488", "#f59e0b", "#8b5cf6", "#ec4899", "#64748b"];
+const COLORS = ["#C9A24B", "#6B8F7A", "#7A8FA6", "#8B3A3A", "#10131C", "#5C6570"];
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -103,7 +103,7 @@ export default function DashboardPage() {
           ) : (
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={spendBySupplier} margin={{ bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E7E0CC" />
                 <XAxis
                   dataKey="name"
                   tick={{ fontSize: 10.5, fill: "#5B6B78" }}
@@ -112,9 +112,9 @@ export default function DashboardPage() {
                   textAnchor="end"
                   height={60}
                 />
-                <YAxis tick={{ fontSize: 12, fill: "#64748b" }} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #eef0f3", fontSize: 13 }} />
-                <Bar dataKey="spend" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                <YAxis tick={{ fontSize: 12, fill: "#5B6B78" }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E3E0D6", fontSize: 13 }} />
+                <Bar dataKey="spend" fill="#C9A24B" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -132,7 +132,7 @@ export default function DashboardPage() {
                     <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #eef0f3", fontSize: 13 }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E7E0CC", fontSize: 13 }} />
                 <Legend wrapperStyle={{ fontSize: 12.5 }} />
               </PieChart>
             </ResponsiveContainer>

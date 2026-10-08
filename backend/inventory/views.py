@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Sum, F
-from accounts.permissions import IsProcurementOrAdmin
+from accounts.permissions import IsAuthenticatedReadOnly, IsProcurementOrAdmin
 from .models import InventoryItem, StockMovement
 from .serializers import InventoryItemSerializer, StockMovementSerializer
 
@@ -10,13 +10,21 @@ from .serializers import InventoryItemSerializer, StockMovementSerializer
 class InventoryItemListCreateView(generics.ListCreateAPIView):
     queryset = InventoryItem.objects.all().order_by("name")
     serializer_class = InventoryItemSerializer
-    permission_classes = [IsProcurementOrAdmin]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsProcurementOrAdmin()]
+        return [IsAuthenticatedReadOnly()]
 
 
 class InventoryItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
-    permission_classes = [IsProcurementOrAdmin]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticatedReadOnly()]
+        return [IsProcurementOrAdmin()]
 
 
 class StockMovementListCreateView(generics.ListCreateAPIView):
@@ -30,14 +38,14 @@ class StockMovementListCreateView(generics.ListCreateAPIView):
 
 class LowStockListView(generics.ListAPIView):
     serializer_class = InventoryItemSerializer
-    permission_classes = [IsProcurementOrAdmin]
+    permission_classes = [IsAuthenticatedReadOnly]
 
     def get_queryset(self):
         return InventoryItem.objects.filter(current_stock__lte=F("low_stock_threshold"))
 
 
 class InventoryAnalyticsView(APIView):
-    permission_classes = [IsProcurementOrAdmin]
+    permission_classes = [IsAuthenticatedReadOnly]
 
     def get(self, request):
         items = InventoryItem.objects.all()

@@ -44,3 +44,16 @@ class IsCashierOrAdmin(BasePermission):
             request.user.is_authenticated and
             request.user.role in ["ADMIN", "CASHIER", "OWNER"]
         )
+
+class IsOwnerOrAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            request.user.role in ["ADMIN", "OWNER"]
+        )
+
+class IsAuthenticatedReadOnly(BasePermission):
+    """Any logged-in user can VIEW (GET); only specific roles can edit — checked separately per view."""
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated)

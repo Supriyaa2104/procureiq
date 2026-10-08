@@ -23,6 +23,6 @@
 }
 
 .analytics-tab.active {
-  color: var(--rust);
-  border-bottom-color: var(--rust);
+  color: var(--gold);
+  border-bottom-color: var(--gold);
 }

@@ -20,8 +20,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--herb-soft);
-  color: var(--herb);
+  background: var(--success-soft);
+  color: var(--success);
   margin-bottom: 10px;
 }
 
@@ -31,13 +31,13 @@
 }
 
 .kpi-icon.pos {
-  background: var(--rust-soft);
-  color: var(--rust);
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .kpi-icon.spend {
-  background: var(--steel-soft);
-  color: var(--steel);
+  background: var(--gold-soft);
+  color: var(--gold);
 }
 
 .kpi-label {
@@ -161,21 +161,21 @@
   font-weight: 600;
   border-radius: 20px;
   white-space: nowrap;
-  background: var(--steel-soft);
-  color: var(--steel);
+  background: var(--info-soft);
+  color: var(--info);
 }
 
 .status-pill.approved, .status-pill.confirmed, .status-pill.delivered, .status-pill.received, .status-pill.paid {
-  background: var(--herb-soft);
-  color: var(--herb);
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .status-pill.pending {
-  background: var(--steel-soft);
-  color: var(--steel);
+  background: var(--info-soft);
+  color: var(--info);
 }
 
 .status-pill.rejected, .status-pill.cancelled {
-  background: var(--rust-soft);
-  color: var(--rust);
+  background: var(--danger-soft);
+  color: var(--danger);
 }

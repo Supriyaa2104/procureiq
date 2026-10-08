@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import Layout from "../components/Layout";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useAuth } from "../context/AuthContext";
 import "./SuppliersPage.css";
 
 const UNITS = ["kg", "litre", "piece", "packet", "gram", "dozen"];
 
 export default function InventoryPage() {
+  const { user } = useAuth();
+  const canEdit = user?.role === "ADMIN" || user?.role === "PROCUREMENT_STAFF";
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showItemForm, setShowItemForm] = useState(false);
@@ -103,29 +106,31 @@ export default function InventoryPage() {
       subtitle="Track stock levels and log stock movements."
     >
       <div className="page-header" style={{ justifyContent: "flex-end" }}>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button
-            className="primary-btn"
-            onClick={() => {
-              setShowMoveForm(!showMoveForm);
-              setShowItemForm(false);
-            }}
-          >
-            {showMoveForm ? "Cancel" : "↕ Log Movement"}
-          </button>
-          <button
-            className="primary-btn"
-            onClick={() => {
-              setShowItemForm(!showItemForm);
-              setShowMoveForm(false);
-            }}
-          >
-            {showItemForm ? "Cancel" : "+ Add Item"}
-          </button>
-        </div>
+        {canEdit && (
+          <div style={{ display: "flex", gap: 10 }}>
+            <button
+              className="primary-btn"
+              onClick={() => {
+                setShowMoveForm(!showMoveForm);
+                setShowItemForm(false);
+              }}
+            >
+              {showMoveForm ? "Cancel" : "↕ Log Movement"}
+            </button>
+            <button
+              className="primary-btn"
+              onClick={() => {
+                setShowItemForm(!showItemForm);
+                setShowMoveForm(false);
+              }}
+            >
+              {showItemForm ? "Cancel" : "+ Add Item"}
+            </button>
+          </div>
+        )}
       </div>
 
-      {showItemForm && (
+      {showItemForm && canEdit && (
         <form className="supplier-form" onSubmit={handleAddItem}>
           <div className="form-grid">
             <div className="form-field">
@@ -170,7 +175,7 @@ export default function InventoryPage() {
         </form>
       )}
 
-      {showMoveForm && (
+      {showMoveForm && canEdit && (
         <form className="supplier-form" onSubmit={handleLogMovement}>
           <div className="form-grid">
             <div className="form-field">
@@ -266,18 +271,20 @@ export default function InventoryPage() {
                 <td>{i.low_stock_threshold}</td>
                 <td>
                   <span
-                    className={`status-pill ${i.is_low_stock ? "rejected" : "approved"}`}
+                    className={`status-pill ${i.is_low_stock ? "low-stock" : "approved"}`}
                   >
                     {i.is_low_stock ? "Low Stock" : "OK"}
                   </span>
                 </td>
                 <td>
-                  <button
-                    className="link-btn danger"
-                    onClick={() => confirmDelete(i)}
-                  >
-                    Delete
-                  </button>
+                  {canEdit && (
+                    <button
+                      className="link-btn danger"
+                      onClick={() => confirmDelete(i)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

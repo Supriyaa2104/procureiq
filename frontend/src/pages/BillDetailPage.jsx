@@ -177,7 +177,7 @@ export default function BillDetailPage() {
               <span
                 style={{
                   fontSize: 11,
-                  color: "#f59e0b",
+                  color: "#C9A24B",
                   fontWeight: 600,
                   display: "block",
                 }}

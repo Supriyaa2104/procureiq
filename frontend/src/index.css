@@ -1,16 +1,17 @@
 :root {
-  --paper: #FAF7F0;
+  --paper: #F5F4F0;
   --paper-card: #FFFFFF;
-  --ink: #1F2D3D;
-  --ink-soft: #5B6B78;
-  --line: #E7E0CC;
-  --herb: #4C7A3F;
-  --herb-soft: #E7F0E2;
-  --rust: #C1440E;
-  --rust-soft: #F7E1D3;
-  --steel: #B9791F;
-  --steel-soft: #FBF0DC;
-  --amber: #D9A441;
+  --ink: #10131C;
+  --ink-soft: #5C6570;
+  --line: #E3E0D6;
+  --success: #6B8F7A;
+  --success-soft: #E7EEE9;
+  --danger: #8B3A3A;
+  --danger-soft: #F3E3E3;
+  --gold: #C9A24B;
+  --gold-soft: #F5ECD8;
+  --info: #7A8FA6;
+  --info-soft: #EAEEF2;
 }
 
 * {

@@ -22,7 +22,7 @@
   padding: 40px 38px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  border-top: 3px solid var(--rust);
+  border-top: 3px solid var(--gold);
   width: 100%;
   max-width: 360px;
 }
@@ -48,7 +48,7 @@
 .login-brand-icon svg {
   width: 15px;
   height: 15px;
-  stroke: var(--amber);
+  stroke: var(--gold);
 }
 
 .login-brand-name {
@@ -100,20 +100,20 @@
 
 .login-field input:focus {
   outline: none;
-  border-color: var(--steel);
+  border-color: var(--gold);
 }
 
 .login-error {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--rust-soft);
-  color: var(--rust);
+  background: var(--danger-soft);
+  color: var(--danger);
   font-size: 12.5px;
   padding: 10px 12px;
   border-radius: 7px;
   margin-bottom: 16px;
-  border: 1px solid var(--rust);
+  border: 1px solid var(--danger);
 }
 
 .login-button {
@@ -130,7 +130,7 @@
 }
 
 .login-button:hover:not(:disabled) {
-  background: #14202D;
+  background: #1C2130;
 }
 
 .login-button:disabled {

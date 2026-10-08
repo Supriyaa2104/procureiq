@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import api from "../../api/axios";
 import "../SuppliersPage.css";
 import "../SupplierPerformancePage.css";
@@ -9,22 +18,26 @@ export default function SupplierPerformanceTab() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/suppliers/performance/")
+    api
+      .get("/suppliers/performance/")
       .then((res) => setData(res.data))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
 
   const scoreColor = (score) => {
-    if (score === null) return "#94a3b8";
-    if (score >= 80) return "#4C7A3F";
-    if (score >= 50) return "#B9791F";
-    return "#C1440E";
+    if (score === null) return "#8A909C";
+    if (score >= 80) return "#6B8F7A";
+    if (score >= 50) return "#C9A24B";
+    return "#8B3A3A";
   };
 
   const chartData = data
     .filter((s) => s.score !== null)
-    .map((s) => ({ name: s.supplier_name, score: s.score }))
+    .map((s) => ({
+      name: s.supplier_name,
+      score: s.score,
+    }))
     .sort((a, b) => b.score - a.score);
 
   const medals = ["🥇", "🥈", "🥉"];
@@ -33,18 +46,42 @@ export default function SupplierPerformanceTab() {
     <>
       <div className="chart-card" style={{ marginBottom: 20 }}>
         <h3>Score Comparison</h3>
+
         {chartData.length === 0 ? (
           <div className="chart-empty">No scored suppliers yet</div>
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={chartData} margin={{ bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="name" tick={{ fontSize: 10.5, fill: "#5B6B78" }} interval={0} angle={-20} textAnchor="end" height={60} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: "#64748b" }} />
-              <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #eef0f3", fontSize: 13 }} />
+
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 10.5, fill: "#5B6B78" }}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={60}
+              />
+
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fontSize: 12, fill: "#64748b" }}
+              />
+
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 8,
+                  border: "1px solid #eef0f3",
+                  fontSize: 13,
+                }}
+              />
+
               <Bar dataKey="score" radius={[6, 6, 0, 0]}>
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={scoreColor(entry.score)} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={scoreColor(entry.score)}
+                  />
                 ))}
               </Bar>
             </BarChart>
@@ -65,40 +102,92 @@ export default function SupplierPerformanceTab() {
               <th>Score</th>
             </tr>
           </thead>
+
           <tbody>
-            {loading && <tr><td colSpan="7" className="empty-row">Loading...</td></tr>}
-            {!loading && data.length === 0 && (
-              <tr><td colSpan="7" className="empty-row">No suppliers yet.</td></tr>
+            {loading && (
+              <tr>
+                <td colSpan="7" className="empty-row">
+                  Loading...
+                </td>
+              </tr>
             )}
+
+            {!loading && data.length === 0 && (
+              <tr>
+                <td colSpan="7" className="empty-row">
+                  No suppliers yet.
+                </td>
+              </tr>
+            )}
+
             {data.map((s, index) => (
               <tr key={s.supplier_id}>
-                <td className="cell-strong">{medals[index] || `#${index + 1}`}</td>
+                <td className="cell-strong">
+                  {medals[index] || `#${index + 1}`}
+                </td>
+
                 <td className="cell-strong">{s.supplier_name}</td>
+
                 <td>{s.category}</td>
+
                 <td>{s.total_orders}</td>
+
+                {/* Completion Rate */}
                 <td>
                   {s.completion_rate !== null ? (
                     <div className="rate-bar-wrap">
                       <div className="rate-bar-track">
-                        <div className="rate-bar-fill" style={{ width: `${s.completion_rate}%`, background: "#4C7A3F" }} />
+                        <div
+                          className="rate-bar-fill"
+                          style={{
+                            width: `${s.completion_rate}%`,
+                            background: "#6B8F7A",
+                          }}
+                        />
                       </div>
-                      <span className="rate-bar-label">{s.completion_rate}%</span>
+
+                      <span className="rate-bar-label">
+                        {s.completion_rate}%
+                      </span>
                     </div>
-                  ) : "—"}
+                  ) : (
+                    "—"
+                  )}
                 </td>
+
+                {/* Punctuality Rate */}
                 <td>
                   {s.punctuality_rate !== null ? (
                     <div className="rate-bar-wrap">
                       <div className="rate-bar-track">
-                        <div className="rate-bar-fill" style={{ width: `${s.punctuality_rate}%`, background: "#B9791F" }} />
+                        <div
+                          className="rate-bar-fill"
+                          style={{
+                            width: `${s.punctuality_rate}%`,
+                            background: "#C9A24B",
+                          }}
+                        />
                       </div>
-                      <span className="rate-bar-label">{s.punctuality_rate}%</span>
+
+                      <span className="rate-bar-label">
+                        {s.punctuality_rate}%
+                      </span>
                     </div>
-                  ) : "—"}
+                  ) : (
+                    "—"
+                  )}
                 </td>
+
+                {/* Score */}
                 <td>
                   {s.score !== null ? (
-                    <span className="status-pill" style={{ background: `${scoreColor(s.score)}22`, color: scoreColor(s.score) }}>
+                    <span
+                      className="status-pill"
+                      style={{
+                        background: `${scoreColor(s.score)}22`,
+                        color: scoreColor(s.score),
+                      }}
+                    >
                       {s.score}
                     </span>
                   ) : (

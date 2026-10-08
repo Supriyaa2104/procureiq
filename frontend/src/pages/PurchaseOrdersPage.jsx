@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import Layout from "../components/Layout";
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useAuth } from "../context/AuthContext";
 import "./SuppliersPage.css";
 
 const STATUSES = ["PENDING", "CONFIRMED", "DELIVERED", "CANCELLED", "DELAYED"];
 
 export default function PurchaseOrdersPage() {
+  const { user } = useAuth();
+  const canApprove = user?.role === "OWNER" || user?.role === "ADMIN";
+  const canEdit = user?.role === "ADMIN" || user?.role === "PROCUREMENT_STAFF";
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [quotations, setQuotations] = useState([]);
@@ -97,18 +102,29 @@ export default function PurchaseOrdersPage() {
     }
   };
 
+  const handleApprove = async (poId) => {
+    try {
+      await api.post(`/purchase-orders/${poId}/approve/`);
+      loadData();
+    } catch (err) {
+      alert("Failed to approve purchase order.");
+    }
+  };
+
   return (
     <Layout
       title="Purchase Orders"
       subtitle="Create and track purchase orders sent to suppliers."
     >
       <div className="page-header" style={{ justifyContent: "flex-end" }}>
-        <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "+ Create Purchase Order"}
-        </button>
+        {canEdit && (
+          <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Cancel" : "+ Create Purchase Order"}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && canEdit && (
         <form className="supplier-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-field">
@@ -241,14 +257,30 @@ export default function PurchaseOrdersPage() {
                   <span className={`status-pill ${po.status.toLowerCase()}`}>
                     {po.status}
                   </span>
+                  {po.requires_approval && !po.is_approved && (
+                    <span className="status-pill pending" style={{ marginLeft: 6 }}>
+                      Needs Approval
+                    </span>
+                  )}
                 </td>
                 <td>
-                  <button
-                    className="link-btn danger"
-                    onClick={() => confirmDelete(po)}
-                  >
-                    Delete
-                  </button>
+                  {po.requires_approval && !po.is_approved && canApprove && (
+                    <button
+                      className="link-btn"
+                      onClick={() => handleApprove(po.id)}
+                      style={{ marginRight: 10 }}
+                    >
+                      Approve
+                    </button>
+                  )}
+                  {canEdit && (
+                    <button
+                      className="link-btn danger"
+                      onClick={() => confirmDelete(po)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import Layout from "../components/Layout";
+import { useAuth } from "../context/AuthContext";
 import "./SuppliersPage.css";
 
 export default function SupplierPaymentsPage() {
+  const { user } = useAuth();
+  const canRecordPayment = user?.role === "ADMIN" || user?.role === "PROCUREMENT_STAFF";
+
   const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -14,8 +19,14 @@ export default function SupplierPaymentsPage() {
 
   const loadData = () => {
     setLoading(true);
-    api.get("/purchase-orders/")
-      .then((res) => setPurchaseOrders(res.data.results ?? res.data))
+    Promise.all([
+      api.get("/purchase-orders/"),
+      api.get("/supplier-payments/"),
+    ])
+      .then(([poRes, paymentsRes]) => {
+        setPurchaseOrders(poRes.data.results ?? poRes.data);
+        setPayments(paymentsRes.data.results ?? paymentsRes.data);
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   };
@@ -44,15 +55,22 @@ export default function SupplierPaymentsPage() {
     }
   };
 
+  const poLabel = (poId) => {
+    const po = purchaseOrders.find((p) => p.id === poId);
+    return po ? `PO-${String(po.id).padStart(4, "0")} — ${po.supplier_name}` : `PO-${String(poId).padStart(4, "0")}`;
+  };
+
   return (
     <Layout title="Supplier Payments" subtitle="Track what you owe suppliers and record payments made.">
-      <div className="page-header" style={{ justifyContent: "flex-end" }}>
-        <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "+ Record Payment"}
-        </button>
-      </div>
+      {canRecordPayment && (
+        <div className="page-header" style={{ justifyContent: "flex-end" }}>
+          <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Cancel" : "+ Record Payment"}
+          </button>
+        </div>
+      )}
 
-      {showForm && (
+      {showForm && canRecordPayment && (
         <form className="supplier-form" onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="form-field">
@@ -87,7 +105,7 @@ export default function SupplierPaymentsPage() {
         </form>
       )}
 
-      <div className="table-card">
+      <div className="table-card" style={{ marginBottom: 20 }}>
         <table>
           <thead>
             <tr>
@@ -120,6 +138,36 @@ export default function SupplierPaymentsPage() {
                   )}
                 </td>
                 <td><span className={`status-pill ${po.status.toLowerCase()}`}>{po.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="table-card">
+        <div className="dash-table-header" style={{ padding: "14px 0 0" }}><h3>Payment History</h3></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Purchase Order</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Paid By</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && <tr><td colSpan="5" className="empty-row">Loading...</td></tr>}
+            {!loading && payments.length === 0 && (
+              <tr><td colSpan="5" className="empty-row">No payments recorded yet.</td></tr>
+            )}
+            {payments.map((p) => (
+              <tr key={p.id}>
+                <td className="cell-strong">{poLabel(p.purchase_order)}</td>
+                <td>Rs. {parseFloat(p.amount).toLocaleString()}</td>
+                <td>{p.method}</td>
+                <td>{p.paid_by_username || "—"}</td>
+                <td>{new Date(p.paid_at).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>

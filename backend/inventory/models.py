@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 
 
+
 class InventoryItem(models.Model):
     name = models.CharField(max_length=255, unique=True)
     unit = models.CharField(max_length=50, help_text="e.g. kg, litre, piece, packet")
@@ -12,12 +13,18 @@ class InventoryItem(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True)
 
+    
+
+    @property
+    def display_name(self):
+        return f"{self.name} ({self.brand.name})" if self.brand else self.name
+
     @property
     def is_low_stock(self):
         return self.current_stock <= self.low_stock_threshold
 
     def __str__(self):
-        return f"{self.name} ({self.current_stock} {self.unit})"
+        return f"{self.display_name} ({self.current_stock} {self.unit})"
 
 
 class StockMovement(models.Model):
@@ -43,4 +50,4 @@ class StockMovement(models.Model):
             self.item.save()
 
     def __str__(self):
-        return f"{self.movement_type} {self.quantity} - {self.item.name}"
+        return f"{self.movement_type} {self.quantity} - {self.item.display_name}"

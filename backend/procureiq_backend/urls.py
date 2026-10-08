@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from .search_views import GlobalSearchView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +27,5 @@ urlpatterns = [
     path('api/', include('purchase_orders.urls')),
     path('api/', include('inventory.urls')),
     path('api/', include('sales.urls')),
+    path('api/search/', GlobalSearchView.as_view(), name='global_search'),
 ]

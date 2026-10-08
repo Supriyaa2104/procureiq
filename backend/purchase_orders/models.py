@@ -12,6 +12,8 @@ class PurchaseOrder(models.Model):
         CANCELLED = "CANCELLED", "Cancelled"
         DELAYED = "DELAYED", "Delayed"
 
+    APPROVAL_THRESHOLD = 20000  # Rs. — POs at or above this need Owner sign-off
+
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="purchase_orders")
     quotation = models.ForeignKey(Quotation, on_delete=models.SET_NULL, null=True, blank=True, related_name="purchase_orders")
     item_name = models.CharField(max_length=255)
@@ -25,8 +27,20 @@ class PurchaseOrder(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="approved_purchase_orders"
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+
     def save(self, *args, **kwargs):
         self.total_amount = self.quantity * self.unit_price
+
+        if self.status == self.Status.CONFIRMED and self.requires_approval and not self.is_approved:
+            raise ValueError(
+                f"This PO (Rs. {self.total_amount}) requires Owner approval before it can be confirmed."
+            )
+
         super().save(*args, **kwargs)
 
     @property
@@ -36,6 +50,14 @@ class PurchaseOrder(models.Model):
     @property
     def balance_due(self):
         return self.total_amount - self.amount_paid
+
+    @property
+    def requires_approval(self):
+        return self.total_amount >= self.APPROVAL_THRESHOLD
+
+    @property
+    def is_approved(self):
+        return self.approved_by_id is not None
 
     def __str__(self):
         return f"PO#{self.id} - {self.item_name} ({self.status})"

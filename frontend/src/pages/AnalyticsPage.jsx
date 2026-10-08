@@ -3,17 +3,20 @@ import Layout from "../components/Layout";
 import SupplierPerformanceTab from "./analytics/SupplierPerformanceTab";
 import SalesTab from "./analytics/SalesTab";
 import InventoryTab from "./analytics/InventoryTab";
+import { useAuth } from "../context/AuthContext";
 import "./SuppliersPage.css";
 import "./analytics/AnalyticsTabs.css";
 
-const TABS = [
-  { id: "suppliers", label: "Supplier Performance" },
-  { id: "sales", label: "Sales" },
-  { id: "inventory", label: "Inventory" },
+const ALL_TABS = [
+  { id: "suppliers", label: "Supplier Performance", hiddenFor: ["CASHIER"] },
+  { id: "sales", label: "Sales", hiddenFor: ["PROCUREMENT_STAFF"] },
+  { id: "inventory", label: "Inventory", hiddenFor: [] },
 ];
 
 export default function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState("suppliers");
+  const { user } = useAuth();
+  const TABS = ALL_TABS.filter((tab) => !tab.hiddenFor.includes(user?.role));
+  const [activeTab, setActiveTab] = useState(TABS[0]?.id);
 
   return (
     <Layout title="Analytics" subtitle="Performance, sales, and inventory insights.">

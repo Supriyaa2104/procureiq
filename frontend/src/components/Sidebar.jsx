@@ -57,7 +57,7 @@ export default function Sidebar() {
             <div className="sidebar-role">{user?.role}</div>
           </div>
         </div>
-        <button className="sidebar-logout" onClick={logout}>Log Out</button>
+        <button className="sidebar-logout" onClick={logout}>Log out</button>
       </div>
     </aside>
   );
